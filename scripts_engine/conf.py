@@ -1,11 +1,14 @@
 import ast
+import dataclasses
 from datetime import date, datetime
 from decimal import Decimal
+from types import MappingProxyType
 from typing import Any, Final, Type
 
 from scripts_engine.types import ModeLiteral
 
 
+@dataclasses.dataclass(frozen=True, slots=True)
 class ScriptsSettings:
     # Режим исполнения скрипта.
     MODE: Final[ModeLiteral] = "exec"
@@ -14,7 +17,7 @@ class ScriptsSettings:
     # Заглушка имени файла исполняемого скрипта.
     FILENAME_PLACEHOLDER: Final[str] = "<wf-scripts_engine>"
     # Разрешённые абстрактные узлы AST скрипта.
-    ALLOWED_AST_NODES: Final[set[Type[ast.AST]]] = {
+    ALLOWED_AST_NODES: Final[set[Type[ast.AST]]] = frozenset({
         # Корневой узел.
         ast.Module,
         # Выражения.
@@ -79,9 +82,9 @@ class ScriptsSettings:
         ast.Tuple,
         ast.Set,
         ast.Dict,
-    }
+    })
     # Разрешённые глобальные имена.
-    ALLOWED_GLOBALS: Final[dict[str, Any]] = {
+    ALLOWED_GLOBALS: Final[dict[str, Any]] = MappingProxyType({
         # Переопределяем `__builtins__` для безопасности.
         "__builtins__": {},  # не удалять!
         # Поддерживаемые singleton-значения.
@@ -116,7 +119,7 @@ class ScriptsSettings:
         "isinstance": isinstance,
         "issubclass": issubclass,
         "exit": exit,
-    }
+    })
 
 
 settings = ScriptsSettings()
